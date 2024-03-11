@@ -1,9 +1,8 @@
-import http from "http";
-import { convertIncomingMessageToRequest } from "./utils";
+import { createAksaRequest, sendAksaResponse } from "./adapter";
 
-export type Handler = (
-  req: Request,
-) => Response | Promise<Response> | string | object | void;
+export type AksaResponse = Response | string | object | void;
+
+export type RequestHandler = (req: Request) => AksaResponse;
 
 type HttpMethod =
   | "GET"
@@ -17,20 +16,18 @@ type HttpMethod =
 type HandlerRegister = {
   method: HttpMethod;
   path: string;
-  handler: Handler;
+  handler: RequestHandler;
 };
 
 export default class Aksa {
   handlers: Array<HandlerRegister> = [];
 
-  constructor() {
-    this.transformHttpMsg = this.transformHttpMsg.bind(this);
-  }
+  constructor() {}
 
   /**
    * add handler to registers
    */
-  add(method: HttpMethod, path: string, handler: Handler) {
+  add(method: HttpMethod, path: string, handler: RequestHandler) {
     const isExist = this.handlers.find(
       (h) => h.method === method && h.path === path,
     );
@@ -43,19 +40,19 @@ export default class Aksa {
     return this;
   }
 
-  get(path: string, handler: Handler) {
+  get(path: string, handler: RequestHandler) {
     this.add("GET", path, handler);
 
     return this;
   }
 
-  post(path: string, handler: Handler) {
+  post(path: string, handler: RequestHandler) {
     this.add("POST", path, handler);
 
     return this;
   }
 
-  handle(req: Request): Response | Promise<Response> | string | object | void {
+  handle(req: Request): AksaResponse {
     const url = new URL(req.url ?? "");
 
     // find register
@@ -74,28 +71,14 @@ export default class Aksa {
     return res;
   }
 
-  // TODO:
-  // - need to moved to adapter
-  async transformHttpMsg(req: http.IncomingMessage, res: http.ServerResponse) {
-    // transform from nodejs http Request Response to agnostic Request and Response
-    //
-    const request = await convertIncomingMessageToRequest(req);
-    const response = this.handle(request);
-
-    console.log({ response });
-
-    // handle write header from Response
-
-    if (response instanceof Response) {
-      res.writeHead(response.status, Object.fromEntries(response.headers));
-    }
-
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.write("Hello World");
-    res.end();
-  }
-
-  listen(port: number) {
-    http.createServer(this.transformHttpMsg).listen(port ?? 3000);
-  }
+  // async createRequestHandler() {
+  //   const request = await createAksaRequest(req);
+  //   const response = this.handle(request);
+  //   console.log({ response });
+  //   sendAksaResponse(res, response);
+  // }
+  //
+  // listen(port: number) {
+  //   http.createServer(this.transformHttpMsg).listen(port ?? 3000);
+  // }
 }
