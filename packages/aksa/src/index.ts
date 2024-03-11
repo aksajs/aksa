@@ -87,7 +87,7 @@ export default class Aksa {
     // handle write header from Response
 
     if (response instanceof Response) {
-      res.writeHead(response.status, response.headers);
+      res.writeHead(response.status, Object.fromEntries(response.headers));
     }
 
     res.writeHead(200, { "Content-Type": "text/html" });

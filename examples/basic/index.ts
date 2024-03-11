@@ -1,4 +1,4 @@
-import Aksa from "../src";
+import Aksa from "@aksajs/aksa";
 
 new Aksa()
   .get("/", () => "Hello world")
