@@ -1,5 +1,3 @@
-import { createAksaRequest, sendAksaResponse } from "./adapter";
-
 export type AksaResponse = Response | string | object | void;
 
 export type RequestHandler = (req: Request) => AksaResponse;
@@ -22,7 +20,9 @@ type HandlerRegister = {
 export default class Aksa {
   handlers: Array<HandlerRegister> = [];
 
-  constructor() {}
+  constructor() {
+    this.handle = this.handle.bind(this);
+  }
 
   /**
    * add handler to registers
@@ -60,7 +60,7 @@ export default class Aksa {
       (i) => i.path == url.pathname && i.method == req.method,
     );
 
-    console.log(req.method, url.pathname, h);
+    console.log(req.method, url.pathname);
 
     let res;
     if (!h) {
@@ -70,15 +70,4 @@ export default class Aksa {
     res = h.handler(req);
     return res;
   }
-
-  // async createRequestHandler() {
-  //   const request = await createAksaRequest(req);
-  //   const response = this.handle(request);
-  //   console.log({ response });
-  //   sendAksaResponse(res, response);
-  // }
-  //
-  // listen(port: number) {
-  //   http.createServer(this.transformHttpMsg).listen(port ?? 3000);
-  // }
 }
