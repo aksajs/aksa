@@ -1,5 +1,5 @@
 import Aksa from "@aksajs/aksa";
-import { createRequestHandler } from "@aksajs/aksa/src/adapter";
+import { createRequestHandler } from "@aksajs/adapter-node";
 import http from "http";
 
 const app = new Aksa()

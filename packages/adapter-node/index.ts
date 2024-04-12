@@ -1,5 +1,5 @@
+import Aksa, { AksaResponse } from "@aksajs/aksa";
 import http from "http";
-import Aksa, { AksaResponse } from ".";
 
 // TODO:
 //
