@@ -4,14 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node index.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@aksajs/adapter-node": "^0.1.0",
-    "@aksajs/aksa": "^0.1.0"
+    "@aksajs/aksa": "../../"
   },
   "devDependencies": {
     "ts-node": "^10.9.2"

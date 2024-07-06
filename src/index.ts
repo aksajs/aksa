@@ -1,6 +1,10 @@
-export type AksaResponse = Response | string | object | void;
+export type AksaResponse = Response;
 
-export type RequestHandler = (req: Request) => AksaResponse;
+export type Context = {
+  req: Request;
+};
+
+export type Handler = (c: Context) => AksaResponse;
 
 type HttpMethod =
   | "GET"
@@ -14,7 +18,7 @@ type HttpMethod =
 type HandlerRegister = {
   method: HttpMethod;
   path: string;
-  handler: RequestHandler;
+  handler: Handler;
 };
 
 export default class Aksa {
@@ -27,7 +31,7 @@ export default class Aksa {
   /**
    * add handler to registers
    */
-  add(method: HttpMethod, path: string, handler: RequestHandler) {
+  add(method: HttpMethod, path: string, handler: Handler) {
     const isExist = this.handlers.find(
       (h) => h.method === method && h.path === path,
     );
@@ -40,13 +44,13 @@ export default class Aksa {
     return this;
   }
 
-  get(path: string, handler: RequestHandler) {
+  get(path: string, handler: Handler) {
     this.add("GET", path, handler);
 
     return this;
   }
 
-  post(path: string, handler: RequestHandler) {
+  post(path: string, handler: Handler) {
     this.add("POST", path, handler);
 
     return this;
@@ -67,7 +71,7 @@ export default class Aksa {
       res = new Response("Not Found", { status: 404 });
       return res;
     }
-    res = h.handler(req);
+    res = h.handler({ req });
     return res;
   }
 }
