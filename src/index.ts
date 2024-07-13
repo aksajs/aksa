@@ -1,8 +1,6 @@
-export type AksaResponse = Response;
+import { Context } from "./context";
 
-export type Context = {
-  req: Request;
-};
+export type AksaResponse = Response;
 
 export type Handler = (c: Context) => AksaResponse;
 
@@ -22,7 +20,7 @@ type HandlerRegister = {
 };
 
 export default class Aksa {
-  handlers: Array<HandlerRegister> = [];
+  private handlers: Array<HandlerRegister> = [];
 
   constructor() {
     this.handle = this.handle.bind(this);
@@ -59,19 +57,20 @@ export default class Aksa {
   handle(req: Request): AksaResponse {
     const url = new URL(req.url ?? "");
 
-    // find register
-    const h = this.handlers.find(
+    // find matching handler in registers
+    const handler = this.handlers.find(
       (i) => i.path == url.pathname && i.method == req.method,
     );
 
     console.log(req.method, url.pathname);
 
-    let res;
-    if (!h) {
-      res = new Response("Not Found", { status: 404 });
+    if (!handler) {
+      const res = new Response("Not Found", { status: 404 });
       return res;
     }
-    res = h.handler({ req });
+
+    const ctx = new Context(req);
+    const res = handler.handler(ctx);
     return res;
   }
 }
