@@ -1,8 +1,8 @@
 export class Context {
-  req: Request;
+  request: Request;
 
   constructor(req: Request) {
-    this.req = req;
+    this.request = req;
   }
 
   text(str: string) {

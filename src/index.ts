@@ -1,23 +1,10 @@
 import { Context } from "./context";
-
-export type AksaResponse = Response;
-
-export type Handler = (c: Context) => AksaResponse;
-
-type HttpMethod =
-  | "GET"
-  | "POST"
-  | "PUT"
-  | "DELETE"
-  | "PATCH"
-  | "HEAD"
-  | "OPTIONS";
-
-type HandlerRegister = {
-  method: HttpMethod;
-  path: string;
-  handler: Handler;
-};
+import type {
+  AksaResponse,
+  Handler,
+  HandlerRegister,
+  HttpMethod,
+} from "./types";
 
 export default class Aksa {
   private handlers: Array<HandlerRegister> = [];
@@ -42,12 +29,18 @@ export default class Aksa {
     return this;
   }
 
+  /**
+   * add a GET handler
+   */
   get(path: string, handler: Handler) {
     this.add("GET", path, handler);
 
     return this;
   }
 
+  /**
+   * add a POST handler
+   */
   post(path: string, handler: Handler) {
     this.add("POST", path, handler);
 
@@ -72,5 +65,9 @@ export default class Aksa {
     const ctx = new Context(req);
     const res = handler.handler(ctx);
     return res;
+  }
+
+  fetch(req: Request): AksaResponse {
+    return this.handle(req);
   }
 }
