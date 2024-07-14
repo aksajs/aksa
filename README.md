@@ -33,8 +33,8 @@ Aksa is a lightweight, ultra-performant web framework designed to empower you to
 
    const app = new Aksa();
 
-   app.get("/", (c) => t.text("Hello world"));
-   app.get("/json", (c) => t.json({ message: "hello" }));
+   app.get("/", (c) => c.text("Hello world"));
+   app.get("/json", (c) => c.json({ message: "hello" }));
 
    export default app;
    ```
