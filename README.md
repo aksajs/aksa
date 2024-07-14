@@ -1,4 +1,4 @@
-**Aksa**
+## Aksa
 
 **A blazing-fast, web standard-based web framework for all JavaScript runtimes.**
 
@@ -10,7 +10,7 @@ Aksa is a lightweight, ultra-performant web framework designed to empower you to
 - Node.js
 - And more!
 
-**Key Features:**
+## Features
 
 - **Speed:** Aksa focus on Web Standards for exceptional performance.
 - **Runtime Agnostic:** Write code once and deploy it across multiple runtimes without modifications.
@@ -18,7 +18,7 @@ Aksa is a lightweight, ultra-performant web framework designed to empower you to
 - **First-Class TypeScript Support:** Develop in TypeScript for a seamless and type-safe experience.
 - **Minimal Dependencies:** Aksa keeps its footprint small, allowing you to focus on your application logic.
 
-**Getting Started:**
+## Getting Started
 
 1. **Installation:**
 
@@ -39,16 +39,13 @@ Aksa is a lightweight, ultra-performant web framework designed to empower you to
    export default app;
    ```
 
-**Documentation:**
-(Link to your documentation will be added here)
+## Documentation
 
-**Contributing:**
+(Link to documentation will be added here)
+
+## Contributing
 
 We encourage contributions to Aksa! Please refer to our contribution guidelines for details: (Link contribution guidelines will be added here)
-
-**License:**
-
-Aksa is licensed under the MIT License. See the LICENSE file for more information.
 
 **We're excited to see what you build with Aksajs!**
 
@@ -59,4 +56,8 @@ Aksa is licensed under the MIT License. See the LICENSE file for more informatio
 - **Benchmarks:** If you have performance benchmarks, include them to highlight Aksa speed advantage.
 - **Roadmap:** Briefly outline your plans for future development to keep users informed.
 
-By incorporating these elements, you'll create a comprehensive and informative README.md that effectively positions Aksajs as a compelling choice for developers seeking a performant and versatile web framework.
+By incorporating these elements, you'll create a comprehensive and informative README.md that effectively positions Aksa as a compelling choice for developers seeking a performant and versatile web framework.
+
+## License
+
+Aksa is licensed under the MIT License. See the LICENSE file for more information.
