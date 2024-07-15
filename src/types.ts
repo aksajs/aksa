@@ -1,10 +1,8 @@
-import { Context } from "./context";
+import type { Context } from "./context";
 
-export type AksaResponse = Response;
+export type Handler = (c: Context) => Response;
 
-export type Handler = (c: Context) => AksaResponse;
-
-export type HttpMethod =
+export type RouteMethod =
   | "GET"
   | "POST"
   | "PUT"
@@ -13,8 +11,9 @@ export type HttpMethod =
   | "HEAD"
   | "OPTIONS";
 
-export type HandlerRegister = {
-  method: HttpMethod;
+export type Route = {
+  method: RouteMethod;
   path: string;
   handler: Handler;
+  regex: RegExp;
 };
