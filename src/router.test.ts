@@ -1,12 +1,13 @@
 import { test, expect } from "bun:test";
 
 test("router test", () => {
-  const path = "/";
+  const path = "/users/:id";
   const routeRegex = path.replace(/:[^/]+/g, "([^/]+)");
   const regex = new RegExp(`^${routeRegex}$`);
 
-  const match = regex.exec("/");
+  const url = "/users/123";
+  const match = url.match(regex);
   console.log(match);
 
-  expect(match).toEqual(["/"]);
+  expect(match).toEqual(["/users/123", "123"]);
 });

@@ -37,13 +37,19 @@ export class Router {
       // Match URL and method with regular expression
       const match = regex.exec(urlObj.pathname);
 
+      console.log(match);
+
       if (match && method.toUpperCase() === route.method.toUpperCase()) {
+        console.log(route);
+
         const params: Record<string, string> = {};
         if (match.groups) {
           // Extract params from match groups
           for (let i = 1; i < match.length; i++) {
             params[route.path.split("/")[i].slice(1)] = match.groups[i - 1];
           }
+
+          console.log(params);
         }
 
         // Wrap handler function in a try-catch block for error handling
