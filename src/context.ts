@@ -1,8 +1,10 @@
-export class Context {
-  request: Request;
+import { AksaRequest } from "./request";
 
-  constructor(req: Request) {
-    this.request = req;
+export class Context {
+  req: AksaRequest;
+
+  constructor(req: AksaRequest) {
+    this.req = req;
   }
 
   text(str: string) {
