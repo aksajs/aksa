@@ -1,5 +1,5 @@
 import { Router } from "./router";
-import { Handler, RouteMethod } from "./types";
+import { Handler, Middleware, RouteMethod } from "./types";
 
 export class Aksa {
   router: Router;
@@ -35,11 +35,15 @@ export class Aksa {
     return this;
   }
 
-  async handle(req: Request): Promise<Response> {
+  async handle(req: Request) {
     return this.router.match(req);
   }
 
-  async fetch(req: Request): Promise<Response> {
+  async fetch(req: Request) {
     return this.router.match(req);
+  }
+
+  use(middleware: Middleware) {
+    this.router.addMiddleware(middleware);
   }
 }

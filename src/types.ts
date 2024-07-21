@@ -1,6 +1,10 @@
 import type { Context } from "./context";
 
-export type Handler = (c: Context) => Response;
+export type Handler = (c: Context) => Promise<Response> | Response;
+
+export type Next = () => Promise<Response | void>;
+
+export type Middleware = (c: Context, next: Next) => Promise<Response | void>;
 
 export type RouteMethod =
   | "GET"

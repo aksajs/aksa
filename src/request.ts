@@ -3,9 +3,9 @@ export class AksaRequest {
   method: string;
   url: string;
   path: string;
-  params?: Record<string, string>;
+  params: Record<string, string>;
 
-  constructor(req: Request, params?: Record<string, string>) {
+  constructor(req: Request, params: Record<string, string> = {}) {
     this.raw = req;
     this.method = req.method;
     this.url = req.url;

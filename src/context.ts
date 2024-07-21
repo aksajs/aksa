@@ -5,9 +5,13 @@ type Data = string | ArrayBuffer | ReadableStream;
 export class Context {
   req: AksaRequest;
   headers: Headers | undefined;
+  finalized: boolean = false;
+  res: Response | undefined;
 
   constructor(req: AksaRequest) {
     this.req = req;
+
+    this.newResponse = this.newResponse.bind(this);
   }
 
   /**

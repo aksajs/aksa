@@ -1,11 +1,15 @@
 import { Context } from "./context";
 import { AksaRequest } from "./request";
-import { Handler, Route, RouteMethod } from "./types";
+import { Handler, Middleware, Route, RouteMethod } from "./types";
 
 export class Router {
   private routes: Route[];
+  private middlewares: Middleware[] = [];
+
   constructor() {
     this.routes = [];
+
+    this.match = this.match.bind(this);
   }
 
   addRoute(method: RouteMethod, path: string, handler: Handler) {
@@ -25,9 +29,78 @@ export class Router {
     });
   }
 
-  async match(req: Request) {
-    const { url, method } = req;
+  addMiddleware(middleware: Middleware) {
+    this.middlewares.push(middleware);
+  }
 
+  async match(req: Request) {
+    const request = new AksaRequest(req);
+    let ctx = new Context(request);
+    const middlewares = this.middlewares;
+    const next = () => this._nextRoute(ctx);
+
+    let index = -1; // Track current middleware index
+
+    async function dispatch(i: number) {
+      if (i <= index) {
+        throw new Error("next() called multiple times");
+      }
+      index = i;
+
+      let res;
+      let handler;
+
+      console.log(i);
+
+      if (middlewares[i]) {
+        handler = middlewares[i];
+      } else {
+        handler = (i === middlewares.length && next) || undefined;
+      }
+
+      if (!handler) {
+        res = new Response("Not Found", { status: 404 });
+      } else {
+        try {
+          res = await handler(ctx, () => {
+            return dispatch(i + 1);
+          });
+        } catch (err) {
+          if (err instanceof Error && ctx instanceof Context) {
+            return;
+          } else {
+            throw err;
+          }
+        }
+      }
+
+      if (res && ctx.finalized === false) {
+        ctx.res = res;
+        ctx.finalized = true;
+      }
+    }
+    await dispatch(0);
+
+    console.log(ctx.res);
+
+    return ctx.res;
+
+    // try {
+    //   // Apply middleware functions before route matching
+    //   const response = await next();
+    //   console.log(response);
+    //   return response;
+    // } catch (error) {
+    //   if (error instanceof StopMiddleware) {
+    //     // Ignore StopMiddleware exception, indicating middleware stopped chain
+    //     return;
+    //   }
+    //   throw error; // Re-throw other errors
+    // }
+  }
+
+  async _nextRoute(ctx: Context) {
+    const { url, method } = ctx.req.raw;
     const urlObj = new URL(url);
 
     console.log(method, urlObj.pathname);
@@ -51,9 +124,9 @@ export class Router {
 
         // Wrap handler function in a try-catch block for error handling
         try {
-          const request = new AksaRequest(req, params);
-          const ctx = new Context(request);
-          return await handler(ctx);
+          const request = new AksaRequest(ctx.req.raw, params);
+          ctx.req = request;
+          return handler(ctx);
         } catch (error) {
           console.error("Error in route handler:", error);
           return new Response("Internal Server Error", { status: 500 });
@@ -64,3 +137,5 @@ export class Router {
     return new Response("Not Found", { status: 404 });
   }
 }
+
+class StopMiddleware extends Error {}
