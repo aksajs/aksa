@@ -50,8 +50,6 @@ export class Router {
       let res;
       let handler;
 
-      console.log(i);
-
       if (middlewares[i]) {
         handler = middlewares[i];
       } else {
@@ -81,22 +79,13 @@ export class Router {
     }
     await dispatch(0);
 
-    console.log(ctx.res);
+    if (!ctx.finalized) {
+      throw new Error(
+        "Context is not finalized. Did you forget to return a Response object or `await next()`?",
+      );
+    }
 
     return ctx.res;
-
-    // try {
-    //   // Apply middleware functions before route matching
-    //   const response = await next();
-    //   console.log(response);
-    //   return response;
-    // } catch (error) {
-    //   if (error instanceof StopMiddleware) {
-    //     // Ignore StopMiddleware exception, indicating middleware stopped chain
-    //     return;
-    //   }
-    //   throw error; // Re-throw other errors
-    // }
   }
 
   async _nextRoute(ctx: Context) {
@@ -137,5 +126,3 @@ export class Router {
     return new Response("Not Found", { status: 404 });
   }
 }
-
-class StopMiddleware extends Error {}
