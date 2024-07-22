@@ -2,14 +2,40 @@ import { compose } from "./compose";
 import { Context } from "./context";
 import { AksaRequest } from "./request";
 import { Router } from "./router";
-import { Handler, Middleware, RouteMethod } from "./types";
+import { Handler, HandlerInterface, Middleware, RouteMethod } from "./types";
 
 export class Aksa {
+  get!: HandlerInterface;
+  post!: HandlerInterface;
+  put!: HandlerInterface;
+  delete!: HandlerInterface;
+  patch!: HandlerInterface;
+  head!: HandlerInterface;
+  options!: HandlerInterface;
+
   router: Router;
   private middlewares: Middleware[] = [];
 
   constructor() {
     this.router = new Router();
+
+    const allMethods = [
+      "get",
+      "post",
+      "put",
+      "delete",
+      "patch",
+      "head",
+      "options",
+    ] as const;
+
+    allMethods.forEach((method) => {
+      this[method] = (path: string, handler: Handler) => {
+        this.addRoute(method.toUpperCase() as RouteMethod, path, handler);
+        return this;
+      };
+    });
+
     this.handle = this.handle.bind(this);
     this.fetch = this.fetch.bind(this);
   }
@@ -23,24 +49,6 @@ export class Aksa {
 
   private addRoute(method: RouteMethod, path: string, handler: Handler) {
     this.router.addRoute(method, path, handler);
-  }
-
-  /**
-   * Add a GET route handler
-   */
-  get(path: string, handler: Handler) {
-    this.addRoute("GET", path, handler);
-
-    return this;
-  }
-
-  /**
-   * Add a POST route handler
-   */
-  post(path: string, handler: Handler) {
-    this.addRoute("POST", path, handler);
-
-    return this;
   }
 
   private dispatch(req: Request) {

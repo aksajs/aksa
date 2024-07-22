@@ -21,3 +21,7 @@ export type Route = {
   handler: Handler;
   regex: RegExp;
 };
+
+export interface HandlerInterface {
+  (path: string, handler: Handler): void;
+}
