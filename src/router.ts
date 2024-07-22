@@ -1,10 +1,9 @@
 import { Context } from "./context";
 import { AksaRequest } from "./request";
-import { Handler, Middleware, Route, RouteMethod } from "./types";
+import { Handler, Route, RouteMethod } from "./types";
 
 export class Router {
   private routes: Route[];
-  private middlewares: Middleware[] = [];
 
   constructor() {
     this.routes = [];
@@ -29,66 +28,7 @@ export class Router {
     });
   }
 
-  addMiddleware(middleware: Middleware) {
-    this.middlewares.push(middleware);
-  }
-
-  async match(req: Request) {
-    const request = new AksaRequest(req);
-    let ctx = new Context(request);
-    const middlewares = this.middlewares;
-    const next = () => this._nextRoute(ctx);
-
-    let index = -1; // Track current middleware index
-
-    async function dispatch(i: number) {
-      if (i <= index) {
-        throw new Error("next() called multiple times");
-      }
-      index = i;
-
-      let res;
-      let handler;
-
-      if (middlewares[i]) {
-        handler = middlewares[i];
-      } else {
-        handler = (i === middlewares.length && next) || undefined;
-      }
-
-      if (!handler) {
-        res = new Response("Not Found", { status: 404 });
-      } else {
-        try {
-          res = await handler(ctx, () => {
-            return dispatch(i + 1);
-          });
-        } catch (err) {
-          if (err instanceof Error && ctx instanceof Context) {
-            return;
-          } else {
-            throw err;
-          }
-        }
-      }
-
-      if (res && ctx.finalized === false) {
-        ctx.res = res;
-        ctx.finalized = true;
-      }
-    }
-    await dispatch(0);
-
-    if (!ctx.finalized) {
-      throw new Error(
-        "Context is not finalized. Did you forget to return a Response object or `await next()`?",
-      );
-    }
-
-    return ctx.res;
-  }
-
-  async _nextRoute(ctx: Context) {
+  async match(ctx: Context) {
     const { url, method } = ctx.req.raw;
     const urlObj = new URL(url);
 
