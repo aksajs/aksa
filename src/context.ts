@@ -6,7 +6,7 @@ export class Context {
   req: AksaRequest;
   headers: Headers | undefined;
   finalized: boolean = false;
-  res: Response | undefined;
+  _res: Response | undefined;
 
   constructor(req: AksaRequest) {
     this.req = req;
@@ -25,6 +25,15 @@ export class Context {
     } else {
       this.headers.delete(name);
     }
+  }
+
+  get res(): Response {
+    return (this._res ||= new Response("404 Not Found", { status: 404 }));
+  }
+
+  set res(res: Response) {
+    this._res = res;
+    this.finalized = true;
   }
 
   newResponse(data: Data | null, arg?: number | ResponseInit) {
