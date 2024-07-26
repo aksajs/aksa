@@ -6,6 +6,7 @@ interface TrieNode {
   children: { [key: string]: TrieNode };
   isTerminal?: boolean;
   route?: Route;
+  dynamicSegment?: string;
 }
 
 export class Router {
@@ -49,6 +50,17 @@ export class Router {
       let currentNode = root;
       for (let i = 0; i < pathSegments.length; i++) {
         const segment = pathSegments[i];
+
+        if (segment.startsWith(":")) {
+          // Create a dynamic segment node
+          currentNode.children[segment] = {
+            children: {},
+            dynamicSegment: segment.substring(1), // Store the dynamic segment name
+          };
+          currentNode = currentNode.children[segment];
+          continue;
+        }
+
         const child = currentNode.children[segment];
 
         if (!child) {
@@ -68,27 +80,55 @@ export class Router {
     }
 
     this.trie = root;
+    // console.log("build trie", JSON.stringify(this.trie, null, 2));
   }
 
   findNode(path: string): TrieNode | undefined {
     const pathSegments = path.split("/");
+    // console.log("pathSegments", pathSegments);
 
     let currentNode = this.trie;
-    for (const segment of pathSegments) {
-      currentNode = currentNode.children[segment];
+    for (let i = 0; i < pathSegments.length; i++) {
+      const segment = pathSegments[i];
+      // console.log("segment:", segment);
+      // console.log(currentNode);
+
+      // Check for exact match first
+      const child = currentNode.children[segment];
+      if (child) {
+        // console.log("match child, dive >>");
+        currentNode = child;
+        continue;
+      }
+
+      // Check for dynamic segment
+      for (const key in currentNode.children) {
+        const child = currentNode.children[key];
+        if (child.dynamicSegment) {
+          // Match dynamic segment
+          // Store the matched value for later use if needed
+          currentNode = child;
+          // console.log("match dynamicSegment", currentNode);
+          break;
+        }
+      }
+
       if (!currentNode) {
-        return undefined; // No matching node found
+        // console.log("no match");
+        return undefined; // No match
       }
     }
 
     return currentNode;
   }
 
-  findRouteTrie(path: string, method: string) {
-    console.log(method);
+  findRouteTrie(method: string, path: string) {
     // Traverse the Trie and perform regex matching on terminal nodes:
     const node = this.findNode(path);
-    if (node?.isTerminal) {
+    if (
+      node?.isTerminal &&
+      method.toUpperCase() === node.route?.method.toUpperCase()
+    ) {
       return node.route;
     }
   }
